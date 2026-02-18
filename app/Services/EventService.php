@@ -20,7 +20,7 @@ class EventService
     {
         return $this->repo->create([
             ...$request->validated(),
-            'created_by'=> Auth::id(),
+            'created_by' => Auth::id(),
         ]);
     }
 }

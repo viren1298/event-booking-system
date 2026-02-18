@@ -7,9 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Booking extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'user_id','ticket_id','quantity','status'
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'status' => 'string',
+        ];
+    }
 
     public function user()
     {

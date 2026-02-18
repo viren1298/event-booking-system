@@ -18,6 +18,13 @@ class Event extends Model
         'created_by'
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'date' => 'datetime',
+        ];
+    }
+
     public function organizer()
     {
         return $this->belongsTo(User::class,'created_by');

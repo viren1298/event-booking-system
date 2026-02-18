@@ -3,22 +3,41 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/register',[AuthController::class,'register']);
-Route::post('/login',[AuthController::class,'login']);
+// Public Authentication Routes
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
-Route::middleware('auth:sanctum')->group(function(){
+// Public Event Routes
+Route::get('/events', [EventController::class, 'index']);
+Route::get('/events/{id}', [EventController::class, 'show']);
 
-    Route::post('/logout',[AuthController::class,'logout']);
-    Route::get('/me',[AuthController::class,'me']);
+// Protected Routes (require authentication)
+Route::middleware('auth:sanctum')->group(function () {
+    // Auth Routes
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/me', [AuthController::class, 'me']);
 
-    Route::get('/events',[EventController::class,'index']);
+    // Event Routes (Organizer/Admin only for create/update/delete)
+    Route::post('/events', [EventController::class, 'store']);
+    Route::put('/events/{id}', [EventController::class, 'update']);
+    Route::delete('/events/{id}', [EventController::class, 'destroy']);
 
-    Route::middleware('role:organizer')->group(function(){
-        Route::post('/events',[EventController::class,'store']);
-    });
+    // Ticket Routes (Organizer/Admin only)
+    Route::post('/events/{eventId}/tickets', [TicketController::class, 'store']);
+    Route::put('/tickets/{id}', [TicketController::class, 'update']);
+    Route::delete('/tickets/{id}', [TicketController::class, 'destroy']);
 
-    Route::middleware(['role:customer','prevent.double.booking'])
-        ->post('/tickets/{id}/bookings',[BookingController::class,'store']);
+    // Booking Routes
+    Route::get('/bookings', [BookingController::class, 'index']);
+    Route::post('/tickets/{ticketId}/bookings', [BookingController::class, 'store'])->middleware('prevent.double.booking');
+    Route::put('/bookings/{id}/cancel', [BookingController::class, 'cancel']);
+
+    // Payment Routes
+    Route::post('/bookings/{bookingId}/payment', [PaymentController::class, 'store']);
+    Route::get('/payments/{id}', [PaymentController::class, 'show']);
 });
+

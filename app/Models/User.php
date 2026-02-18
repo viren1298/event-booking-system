@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -48,16 +49,25 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Get all events created by this user
+     */
     public function events()
     {
-        return $this->hasMany(Event::class,'created_by');
+        return $this->hasMany(Event::class, 'created_by');
     }
 
+    /**
+     * Get all bookings made by this user
+     */
     public function bookings()
     {
         return $this->hasMany(Booking::class);
     }
 
+    /**
+     * Get all payments made by this user through bookings
+     */
     public function payments()
     {
         return $this->hasManyThrough(Payment::class, Booking::class);
